@@ -47,8 +47,5 @@ public class MongoFacade {
 		db = mongo.getDatabase(dbName);
 	}
 	
-	public void createDatabase() {
-		
-	}
 	
 }
