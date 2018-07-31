@@ -11,7 +11,7 @@ public class DBDriver {
 		Config config = new Config(args[0]);
 		
 		DatabaseJob dbJob = new DatabaseJob(config);
-		dbJob.createDatabase();
+		dbJob.updateDatabase();
 		
 	}
 	

@@ -11,8 +11,6 @@ import java.util.Properties;
  *
  */
 public class Config {
-
-	private Properties prop;
 	
 	public Config(String configFileName) {
 				
@@ -30,5 +28,4 @@ public class Config {
 	public String getProperty(String key) {
 		return System.getProperty(key);
 	}
-	
 }
