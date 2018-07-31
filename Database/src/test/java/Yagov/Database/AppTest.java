@@ -1,5 +1,8 @@
 package Yagov.Database;
 
+import com.yagov.db.MongoFacade;
+import com.yagov.util.Config;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -33,6 +36,9 @@ public class AppTest
      */
     public void testApp()
     {
+		Config config = new Config("yagov.properties");
+    	MongoFacade mongo = new MongoFacade(config.getProperty("dbName"));
+    	System.out.println(mongo.getBillText(114, "hr10"));
         assertTrue( true );
     }
 }

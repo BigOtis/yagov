@@ -1,7 +1,11 @@
 package com.yagov.db;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.Scanner;
 
 import com.yagov.util.Config;
 
@@ -11,6 +15,8 @@ public class DatabaseJob {
 	private String congressDataPath;
 	private String dbName;
 	private MongoFacade mongo;
+	
+	private Integer billsProcessed = 0;
 	
 	public DatabaseJob(Config config) {
 		
@@ -64,8 +70,31 @@ public class DatabaseJob {
 	
 	public void parseBillDir(File dir, Integer congress) {
 		
-		
-		
+		for(File f : dir.listFiles()) {
+
+			File billTextDir = new File(f.getAbsolutePath() + "\\text-versions");
+			File billTextFile = billTextDir.listFiles()[0];
+			billTextFile = new File(billTextFile.getAbsolutePath() + "\\document.txt");
+			
+			File billJSON = new File(f.getAbsolutePath() + "\\data.json");
+			String billText = dir.getName();
+			try {
+				Scanner scan = new Scanner(billTextFile).useDelimiter("\\Z");
+				billText = scan.next();
+				scan.close();				
+			} 
+			catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+			
+			mongo.updateBillText(congress, f.getName(), billText);
+
+			if((billsProcessed % 100) == 0) {
+				System.out.println("Bills processed: " + billsProcessed);
+				
+			}
+			billsProcessed++;
+		}		
 	}
 
 }

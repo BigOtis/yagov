@@ -4,7 +4,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import org.bson.Document;
+
 import com.mongodb.MongoClient;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
 /**
@@ -15,7 +19,6 @@ import com.mongodb.client.MongoDatabase;
  *
  */
 public class MongoFacade {
-
 	
 	/**
 	 * MongoClient API
@@ -26,13 +29,9 @@ public class MongoFacade {
 	 * MongoDatabase API
 	 */
 	private MongoDatabase db;
-	
-	private String dbName;
-	
+		
 	public MongoFacade(String dbName){
-		
-		this.dbName = dbName;
-		
+				
         try {
 			System.getProperties().load(new FileInputStream("mongo.properties"));
 		} catch (IOException e) {
@@ -47,5 +46,40 @@ public class MongoFacade {
 		db = mongo.getDatabase(dbName);
 	}
 	
+	public void updateBillText(Integer congress, String billName, String text) {
+		
+		MongoCollection<Document> billCollection = db.getCollection("BillText-"+congress);
+		FindIterable<Document> bills = billCollection.find(new Document("bill_id", getBillID(congress, billName)));
+		Document bill = bills.first();
+		if(bill == null) {
+			bill = new Document("bill_id", getBillID(congress, billName));
+			bill.append("text", text);
+			billCollection.insertOne(bill);
+		}
+		else {
+			bill.append("text", text);
+			billCollection.replaceOne(getID(bill), bill);
+		}
+		
+	}
 	
+	public String getBillText(Integer congress, String billName) {
+		MongoCollection<Document> billCollection = db.getCollection("BillText-"+congress);
+		FindIterable<Document> bills = billCollection.find(new Document("bill_id", getBillID(congress, billName)));
+		Document bill = bills.first();
+		if(bill == null){
+			return null;
+		}
+		
+		return bill.getString("text");
+
+	}
+	
+	public String getBillID(Integer congress, String billName) {
+		return congress + "-" + billName;
+	}
+	
+	public Document getID(Document original) {
+		return new Document("_id", original.get("_id"));
+	}
 }
