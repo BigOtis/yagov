@@ -1,11 +1,7 @@
 package com.yagov.db;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.util.Scanner;
 
 import com.yagov.util.Config;
 
@@ -35,12 +31,26 @@ public class DatabaseJob {
 	 */
 	public void updateDatabase() {
 		
+		// Load in updated bill data
 		File dir = new File(congressDataPath);
 		for(File congDir : dir.listFiles()) {
 			parseCongressDir(congDir);
 		}
 	}
 	
+	/**
+	 * Parses a directory pulled from ther US Congress parsers:
+	 *     https://github.com/unitedstates/congress
+	 *     
+	 * Stores the data in a MongoDB with the following collections:
+	 * 	BillText-nnn (nnn = congress number, ie 114, 115)
+	 *   - The full text bill
+	 *  Bills-nnn     
+	 *   - The metadata for a bill
+	 *  People 
+	 *   - Info about the individual members of congress
+	 * @param dir
+	 */
 	public void parseCongressDir(File dir) {
 		
 		Integer congress = Integer.parseInt(dir.getName());
@@ -71,29 +81,29 @@ public class DatabaseJob {
 	public void parseBillDir(File dir, Integer congress) {
 		
 		for(File f : dir.listFiles()) {
-
-			File billTextDir = new File(f.getAbsolutePath() + "\\text-versions");
-			File billTextFile = billTextDir.listFiles()[0];
-			billTextFile = new File(billTextFile.getAbsolutePath() + "\\document.txt");
-			
-			File billJSON = new File(f.getAbsolutePath() + "\\data.json");
-			String billText = dir.getName();
 			try {
-				Scanner scan = new Scanner(billTextFile).useDelimiter("\\Z");
-				billText = scan.next();
-				scan.close();				
-			} 
-			catch (FileNotFoundException e) {
+				// Update the full text from this bill, if it has changed
+				File billTextDir = new File(f.getAbsolutePath() + "\\text-versions");
+				File billTextFile = billTextDir.listFiles()[0];
+				billTextFile = new File(billTextFile.getAbsolutePath() + "\\document.txt");
+				mongo.updateBillText(congress, f.getName(), billTextFile);
+	
+				// Update the metadata for this bill if it has changed
+				File billJSON = new File(f.getAbsolutePath() + "\\data.json");
+				mongo.updateBillJSON(congress, f.getName(), billJSON);
+				
+				if((billsProcessed % 1000) == 0) {
+					System.out.println("Bills processed: " + billsProcessed);
+					
+				}
+				billsProcessed++;
+			}
+			catch(Exception e) {
+				// The bill JSON likely was not downloaded yet
+				// - just skip this bill for now
+				System.out.println("Error parsing bill: " + f.getAbsolutePath());
 				e.printStackTrace();
 			}
-			
-			mongo.updateBillText(congress, f.getName(), billText);
-
-			if((billsProcessed % 100) == 0) {
-				System.out.println("Bills processed: " + billsProcessed);
-				
-			}
-			billsProcessed++;
 		}		
 	}
 
