@@ -58,6 +58,15 @@ public class MongoFacade {
 		db = mongo.getDatabase(dbName);
 	}
 	
+	public Document getBillDoc(Integer congress, String billName) {
+		
+		MongoCollection<Document> billCollection = db.getCollection("Bills-"+congress);
+		FindIterable<Document> bills = billCollection.find(
+				new Document("bill_id", getBillID(congress, billName)));
+		Document bill = bills.first();
+		return bill;
+	}
+	
 	/**
 	 * Updates a Bill document from the given JSON File
 	 *  If no BillText doc exists, a new one will be created
@@ -139,6 +148,14 @@ public class MongoFacade {
 
 	}
 	
+	/**
+	 * Checks the lastModified field on a given Bill document
+	 * against the given last modified date of a file
+	 * 
+	 * @param bill
+	 * @param fileLastModified
+	 * @return true, if the bill date is older than the fileLastModified date
+	 */
 	public boolean billWasModified(Document bill, Date fileLastModified) {
 		
 		Date lastModifiedDB = bill.getDate("lastModified");
