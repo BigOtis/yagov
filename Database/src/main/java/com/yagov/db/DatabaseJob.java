@@ -5,6 +5,14 @@ import java.io.FileFilter;
 
 import com.yagov.util.Config;
 
+/**
+ * A job that can be run daily that will
+ * ensure the associated Congress MongoDB
+ * is up to date from the scraped file structure
+ * 
+ * @author OtIs - otis1017@gmail.com
+ *
+ */
 public class DatabaseJob {
 	
 	private Config config;
@@ -17,12 +25,9 @@ public class DatabaseJob {
 	public DatabaseJob(Config config) {
 		
 		this.config = config;
-		
 		this.congressDataPath = config.getProperty("congressDataPath");
-		
 		this.dbName = config.getProperty("dbName");
 		this.mongo = new MongoFacade(dbName);
-
 	}
 	
 	
@@ -78,6 +83,14 @@ public class DatabaseJob {
 		}
 	}
 	
+	/**
+	 * Loops through the entire Bill directory
+	 * and pushes any updated bill text/metadata
+	 * to the database
+	 * 
+	 * @param dir
+	 * @param congress
+	 */
 	public void parseBillDir(File dir, Integer congress) {
 		
 		for(File f : dir.listFiles()) {
@@ -106,5 +119,4 @@ public class DatabaseJob {
 			}
 		}		
 	}
-
 }

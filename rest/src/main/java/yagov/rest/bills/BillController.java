@@ -9,8 +9,14 @@ public class BillController {
 
 
     @RequestMapping("/bill")
-    public Bill greeting(@RequestParam(value="congress", defaultValue="115") Integer congress,
-    		  			@RequestParam(value="billName") String billName) {
+    public Bill getBill(@RequestParam(value="congress", defaultValue="115") Integer congress,
+    		  			@RequestParam(value="name") String billName) {
         return new Bill(congress, billName);
+    }
+    
+    @RequestMapping("/billtext")
+    public BillText getBillText(@RequestParam(value="congress", defaultValue="115") Integer congress,
+    		  			@RequestParam(value="name") String billName) {
+        return new BillText(congress, billName);
     }
 }

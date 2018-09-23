@@ -9,7 +9,7 @@ import com.yagov.db.MongoFacade;
 import yagov.rest.mongo.MongoSingleton;
 
 /**
- * Hello world! from a little d0g named bust3r
+ * Bill - returns the requested Bill Metadata
  *
  */
 public class Bill {
@@ -18,14 +18,12 @@ public class Bill {
 	private final String bill_id;
 	private final List<String> subjects;
 	
-    public Bill(Integer congress, String billName) {
+    @SuppressWarnings("unchecked")
+	public Bill(Integer congress, String billName) {
     	
     	Document billDoc = mongo.getBillDoc(congress, billName);
-    	
     	this.bill_id = billDoc.getString("bill_id");
-    	this.subjects = (List<String>) billDoc.get("subjects");
-    	System.out.println(subjects);
-    	
+    	this.subjects = (List<String>) billDoc.get("subjects");    	
     }
     
     public String getBill_id() {
