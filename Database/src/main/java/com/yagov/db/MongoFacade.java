@@ -60,7 +60,7 @@ public class MongoFacade {
 	
 	public Document getBillDoc(Integer congress, String billName) {
 		
-		MongoCollection<Document> billCollection = db.getCollection("Bills-"+congress);
+		MongoCollection<Document> billCollection = db.getCollection("Bills");
 		FindIterable<Document> bills = billCollection.find(
 				new Document("bill_id", getBillID(congress, billName)));
 		Document bill = bills.first();
@@ -76,7 +76,7 @@ public class MongoFacade {
 	 */
 	public void updateBillJSON(Integer congress, String billName, File billJSON) {
 		
-		MongoCollection<Document> billCollection = db.getCollection("Bills-"+congress);
+		MongoCollection<Document> billCollection = db.getCollection("Bills");
 		FindIterable<Document> bills = billCollection.find(
 				new Document("bill_id", getBillID(congress, billName)))
 					.projection(Projections.include("_id", "lastModified"));
@@ -108,7 +108,7 @@ public class MongoFacade {
 	 */
 	public void updateBillText(Integer congress, String billName, File billFile) {
 		
-		MongoCollection<Document> billCollection = db.getCollection("BillText-"+congress);
+		MongoCollection<Document> billCollection = db.getCollection("BillText");
 		FindIterable<Document> bills = billCollection.find(
 				new Document("bill_id", getBillID(congress, billName)))
 					.projection(Projections.include("_id", "lastModified"));
@@ -137,7 +137,7 @@ public class MongoFacade {
 	 * @return
 	 */
 	public String getBillText(Integer congress, String billName) {
-		MongoCollection<Document> billCollection = db.getCollection("BillText-"+congress);
+		MongoCollection<Document> billCollection = db.getCollection("BillText");
 		FindIterable<Document> bills = billCollection.find(new Document("bill_id", getBillID(congress, billName)));
 		Document bill = bills.first();
 		if(bill == null){

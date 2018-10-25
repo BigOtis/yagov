@@ -14,7 +14,6 @@ public class BillText {
 	private final String bill_id;
 	private final String fullText;
 	
-    @SuppressWarnings("unchecked")
 	public BillText(Integer congress, String billName) {
     	
     	this.fullText = mongo.getBillText(congress, billName);
